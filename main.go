@@ -39,11 +39,11 @@ func main() {
 }
 
 func reindeerArrives() {
-	time.Sleep(time.Duration(1) * time.Second) // Reindeer's arrival
-	fmt.Printf("Rena: Volta das férias\n")
-
 	mutex.Wait()
 	reindeer++
+	time.Sleep(time.Duration(1) * time.Second) // Reindeer's arrival
+	fmt.Println("Rena: Volta das férias", reindeer)
+
 	if reindeer == 9 {
 		santaSem.Signal()
 	}
@@ -54,12 +54,12 @@ func reindeerArrives() {
 }
 
 func elfArrives() {
-	time.Sleep(time.Duration(1) * time.Second) // Elf arrives
-	fmt.Println("Elfo: Pede Ajuda")
 
 	elfTex.Wait()
 	mutex.Wait()
 	elves++
+	time.Sleep(time.Duration(1) * time.Second) // Elf arrives
+	fmt.Println("Elfo: Pede Ajuda", elves)
 	if elves == 3 {
 		santaSem.Signal()
 	} else {
@@ -98,8 +98,6 @@ func getHelp() {
 
 // The rest of the code remains the same.
 
-
-
 type Semaphore struct {
 	v    int
 	fila chan struct{}
@@ -134,4 +132,3 @@ func (s *Semaphore) Signal() {
 	}
 	<-s.sc
 }
-
