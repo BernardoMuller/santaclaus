@@ -13,12 +13,13 @@ var reindeerSem = NewSemaphore(0)
 var elfTex = NewSemaphore(1)
 
 func main() {
-	for i := 1; i <= 9; i++ {
-		go reindeerArrives()
+
+	for i := 1; i <= 1000; i++ {
+		go elfArrives()
 	}
 
-	for i := 1; i <= 100; i++ {
-		go elfArrives()
+	for i := 1; i <= 9; i++ {
+		go reindeerArrives()
 	}
 
 	for {
@@ -29,7 +30,7 @@ func main() {
 			prepareSleigh()
 			reindeerSem.Signal()
 			fmt.Println("É Natal, entregando presentes!")
-			return // Encerre o programa
+			return
 		} else if elves == 3 {
 			helpElves()
 		}
@@ -38,32 +39,19 @@ func main() {
 	}
 }
 
-func reindeerArrives() {
-	mutex.Wait()
-	reindeer++
-	time.Sleep(time.Duration(1) * time.Second) // Reindeer's arrival
-	fmt.Println("Rena: Volta das férias", reindeer)
-
-	if reindeer == 9 {
-		santaSem.Signal()
-	}
-	mutex.Signal()
-
-	reindeerSem.Wait()
-	getHitched()
-}
-
 func elfArrives() {
-
 	elfTex.Wait()
 	mutex.Wait()
 	elves++
-	time.Sleep(time.Duration(1) * time.Second) // Elf arrives
+
 	fmt.Println("Elfo: Pede Ajuda", elves)
 	if elves == 3 {
 		santaSem.Signal()
+
 	} else {
+
 		elfTex.Signal()
+
 	}
 	mutex.Signal()
 
@@ -77,6 +65,22 @@ func elfArrives() {
 	mutex.Signal()
 }
 
+func reindeerArrives() {
+	mutex.Wait()
+	reindeer++
+	fmt.Println("Rena: Volta das férias", reindeer)
+
+	if reindeer == 9 {
+		for i := 0; i < 9; i++ {
+			santaSem.Signal()
+		}
+	}
+	mutex.Signal()
+
+	reindeerSem.Wait()
+	getHitched()
+}
+
 func prepareSleigh() {
 	fmt.Println("Santa: Preparando o trenó")
 }
@@ -87,16 +91,14 @@ func getHitched() {
 }
 
 func helpElves() {
-	fmt.Println("Santa: Ajudando os elfos")
+	fmt.Println("Santa: Ajudando os elfos", elves)
 	time.Sleep(1 * time.Second)
 }
 
 func getHelp() {
-	fmt.Println("Elfos: Recebendo ajuda")
-	time.Sleep(1 * time.Second) // Simulate the elf getting help
+	fmt.Println("Elfos: Esperando ajuda", elves)
+	time.Sleep(1 * time.Second)
 }
-
-// The rest of the code remains the same.
 
 type Semaphore struct {
 	v    int
